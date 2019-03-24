@@ -73,7 +73,7 @@ genFunction allRParams req = let
 
 
 genSignature :: Text -> [PSType] -> Maybe PSType -> Doc
-genSignature = genSignatureBuilder $ "forall m a." <+/> "MonadAsk (SPSettings_ SPParams_) m" <+/> "=>"
+genSignature = genSignatureBuilder $ const $ "forall m a." <+/> "MonadAsk (SPSettings_ SPParams_) m" <+/> "=>"
 
 genFnBody :: Text -> [Text] -> Doc
 genFnBody fName params = "do"

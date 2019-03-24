@@ -88,10 +88,10 @@ genGetReaderParams = stack . map (genGetReaderParam . psVar . _pName)
 
 
 genSignature :: Text -> [PSType] -> Maybe PSType -> Doc
-genSignature = genSignatureBuilder $ "forall eff m." <+/> "MonadAsk (SPSettings_ SPParams_) m => MonadError AjaxError m => MonadAff ( ajax :: AJAX | eff) m" <+/> "=>"
+genSignature = genSignatureBuilder $ \ res -> "forall eff m." <+/> "MonadAsk (SPSettings_ SPParams_) m => MonadError (AjaxError " <+/> res <+/> ") m => MonadAff m" <+/> "=>"
 
-genSignatureBuilder :: Doc -> Text -> [PSType] -> Maybe PSType -> Doc
-genSignatureBuilder constraint fnName params mRet = fName <+> "::" <+> align (constraint <+/> parameterString)
+genSignatureBuilder :: (Doc -> Doc) -> Text -> [PSType] -> Maybe PSType -> Doc
+genSignatureBuilder constraint fnName params mRet = fName <+> "::" <+> align (constraint retName <+/> parameterString)
   where
     fName = strictText fnName
     retName = maybe "Unit" (strictText . typeInfoToText False) mRet
@@ -112,7 +112,7 @@ genFnBody rParams req = "do"
       </> "let spOpts_ = case spOpts_' of SPSettings_ o -> o"
       </> "let spParams_ = case spOpts_.params of SPParams_ ps_ -> ps_"
       </> genGetReaderParams rParams
-      </> hang 6 ("let httpMethod =" <+> dquotes (req ^. reqMethod ^. to T.decodeUtf8 ^. to strictText))
+      </> hang 6 ("let httpMethod = fromString" <+> dquotes (req ^. reqMethod ^. to T.decodeUtf8 ^. to strictText))
       </> genBuildQueryArgs (req ^. reqUrl ^. queryStr)
       </> hang 6 ("let reqUrl ="     <+> genBuildURL (req ^. reqUrl))
       </> "let reqHeaders =" </> indent 6 (req ^. reqHeaders ^. to genBuildHeaders)
@@ -128,10 +128,11 @@ genFnBody rParams req = "do"
               Just _  -> ", content =" <+> "toNullable <<< Just <<< stringify <<< encodeJson $ reqBody" </> "}"
       )
       </> if shallParseBody (req^.reqReturnType)
-          then "affResp <- affjax affReq"
+          then "affResp <- ajax affReq"
            </> "let decodeJson = case spOpts_.decodeJson of SPSettingsDecodeJson_ d -> d"
-           </> "getResult affReq decodeJson affResp"
-          else "_ <- affjax affReq"
+--           </> "getResult affReq decodeJson affResp"
+           </> "pure affResp"
+          else "_ <- ajax affReq"
            </> "pure unit"
     ) <> line
   where

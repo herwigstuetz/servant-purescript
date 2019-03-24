@@ -97,16 +97,18 @@ defaultSettings = Settings {
   , _standardImports = importsFromList
         [ ImportLine "Control.Monad.Reader.Class" (Set.fromList [ "class MonadAsk", "ask" ])
         , ImportLine "Control.Monad.Error.Class" (Set.fromList [ "class MonadError" ])
-        , ImportLine "Control.Monad.Aff.Class" (Set.fromList [ "class MonadAff" ])
-        , ImportLine "Network.HTTP.Affjax" (Set.fromList [ "AJAX" ])
+        , ImportLine "Effect.Aff.Class" (Set.fromList [ "class MonadAff" ])
         , ImportLine "Data.Nullable" (Set.fromList [ "toNullable" ])
-        , ImportLine "Servant.PureScript.Affjax" (Set.fromList [ "AjaxError", "defaultRequest", "affjax" ])
+        , ImportLine "Servant.PureScript.Ajax" (Set.fromList [ "AjaxError", "ajax" ])
+        , ImportLine "Affjax" (Set.fromList [ "defaultRequest", "request" ])
         , ImportLine "Servant.PureScript.Settings" (Set.fromList [ "SPSettings_(..)", "SPSettingsDecodeJson_(..)", "SPSettingsEncodeJson_(..)", "gDefaultToURLPiece" ])
-        , ImportLine "Servant.PureScript.Util" (Set.fromList [ "encodeListQuery", "encodeURLPiece", "encodeQueryItem", "getResult", "encodeHeader" ])
+        , ImportLine "Servant.PureScript.Util" (Set.fromList [ "encodeListQuery", "encodeURLPiece", "encodeQueryItem", "encodeHeader" ])
         , ImportLine "Prim" (Set.fromList [ "String" ]) -- For baseURL!
         , ImportLine "Data.Maybe" (Set.fromList [ "Maybe(..)"])
+        , ImportLine "Data.Either" (Set.fromList [ "Either(..)"])
         , ImportLine "Data.String" (Set.fromList ["joinWith"])
         , ImportLine "Data.Array" (Set.fromList ["catMaybes", "null"])
+        , ImportLine "Data.HTTP.Method" (Set.fromList ["fromString"])
         , ImportLine "Data.Argonaut.Core" (Set.fromList [ "stringify" ])
         ]
   , _generateSubscriberAPI = False
